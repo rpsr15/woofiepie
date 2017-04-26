@@ -1,0 +1,6 @@
+framework module Pods_WoofiePie {
+  umbrella header "Pods-WoofiePie-umbrella.h"
+
+  export *
+  module * { export * }
+}

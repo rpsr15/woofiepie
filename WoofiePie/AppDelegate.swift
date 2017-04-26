@@ -8,7 +8,9 @@
 
 import UIKit
 import CoreData
-
+import FirebaseAuth
+import Firebase
+import FirebaseDatabase
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -17,6 +19,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+         window?.tintColor = APP_BLUE_COLOR
+        FIRApp.configure()
+        FIRDatabase.database().persistenceEnabled = true
+       
+        //check if user is signed in . if yes take him to tabbar directly
         return true
     }
 

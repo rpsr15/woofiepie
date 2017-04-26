@@ -9,9 +9,19 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>nn.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>8</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>41442EFC1E951D2A00266FE2</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>41EE25AB1E647B7A0065A571</key>
 		<dict>
 			<key>primary</key>
