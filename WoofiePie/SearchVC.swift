@@ -29,6 +29,7 @@ class SearchVC: UIViewController ,CLLocationManagerDelegate , UITableViewDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.contentInset = UIEdgeInsets(top: 5.0, left: 0, bottom: 0, right: 0)
         self.tableView.delegate = self
         self.tableView.dataSource = self
         self.breedTextField.list = breeds
@@ -143,7 +144,7 @@ class SearchVC: UIViewController ,CLLocationManagerDelegate , UITableViewDelegat
     func takeCareOfTopView(){
         
         if isTopViewExpanded{
-            self.topVIewHeightConstraint.constant = 58
+            self.topVIewHeightConstraint.constant = 70
             self.isTopViewExpanded = false
             self.searchStack.isHidden = true
             self.view.endEditing(true)
@@ -224,4 +225,18 @@ class SearchVC: UIViewController ,CLLocationManagerDelegate , UITableViewDelegat
     
    
 
+}
+
+
+extension SearchVC : UITextFieldDelegate{
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == breedTextField{
+            genderTextField.becomeFirstResponder()
+        }
+        if textField == genderTextField{
+            genderTextField.resignFirstResponder()
+           
+        }
+        return true
+    }
 }

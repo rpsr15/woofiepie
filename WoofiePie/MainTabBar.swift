@@ -12,7 +12,8 @@ class MainTabBar: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.tabBar.backgroundColor = APP_BLUE_COLOR
+        self.tabBar.tintColor = APP_BLUE_COLOR
         // Do any additional setup after loading the view.
     }
     

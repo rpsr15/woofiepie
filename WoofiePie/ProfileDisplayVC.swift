@@ -43,6 +43,13 @@ class ProfileDisplayVC: UIViewController , UITableViewDataSource , UITableViewDe
        // performSegue(withIdentifier: "profileToConversation", sender: <#T##Any?#>)
      
     }
+    func loadProfileImage(){
+        downloadImage(name: self.profileId, directory: "UserImages") { (image) in
+            DispatchQueue.main.async {
+                self.profileImage.profileImage = image
+            }
+        }
+    }
     func presentChatVC(conversation : Conversation){
         self.cM = nil
     let storyBoard = UIStoryboard(name: "Main", bundle: nil)
@@ -79,9 +86,10 @@ class ProfileDisplayVC: UIViewController , UITableViewDataSource , UITableViewDe
         super.viewDidLoad()
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.tableView.contentInset = UIEdgeInsets(top: 5.0, left: 0, bottom: 0, right: 0)
         self.selfProfileId = UserDefaults.standard.value(forKey: "uid") as! String
         getUserDetails(userId: profileId)
-        
+        self.loadProfileImage()
         
     }
    

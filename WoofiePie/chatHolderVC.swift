@@ -23,7 +23,7 @@ class chatHolderVC: UIViewController {
     //MARK: IBAction
     @IBAction func backButtonPressed(_ sender: UIButton) {
         // set has read to true
-      //  ref.child("Users").child(selfid).child("conversations").child(conversation.conversationId).child("hasRead").setValue(true)
+        ref.child("Users").child(selfid).child("conversations").child(conversation.conversationId).child("hasRead").setValue(true)
         self.dismiss(animated: true, completion: nil)
         
     }

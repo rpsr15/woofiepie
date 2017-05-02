@@ -70,8 +70,22 @@ class Message {
    func  getJSQMessage() -> JSQMessage{
     //TODO: take care of messages with media
     let createdOn = Date(timeIntervalSince1970: self.timeStamp)
-   
+   // if media message return media message
+    
+    if self.isMediaMessage{
+        let image = #imageLiteral(resourceName: "userTestPicture")
+        let mediaData = JSQPhotoMediaItem(image: nil)
+        
+        return JSQMessage(senderId: self.senderid, displayName: "sender", media: mediaData)
+    }
+    else {
+        
         return JSQMessage(senderId: self.senderid, senderDisplayName: "sender", date: createdOn, text: self.text)
+    }
+    
+    
+    
+    
     }
     
     func getDictionary() -> [String : Any]{

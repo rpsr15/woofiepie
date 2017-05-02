@@ -10,7 +10,7 @@ import UIKit
 
 class ConversationCell: UITableViewCell {
     
-    @IBOutlet weak var profileImage : UIImageView!
+    @IBOutlet weak var profileImage : ProfileImageHolder!
     @IBOutlet weak var receiverNameLabel : UILabel!
     @IBOutlet weak var latestMessage : UILabel!
     @IBOutlet weak var hasReadButton : UIButton!
@@ -26,7 +26,11 @@ class ConversationCell: UITableViewCell {
 
     func configureCell(useridOfOtherUser : String , latestMessage : String){
         
-        
+        downloadImage(name: useridOfOtherUser, directory: "UserImages") { (image) in
+            DispatchQueue.main.async {
+            self.profileImage.profileImage = image
+            }
+        }
         ref.child("Users").child(useridOfOtherUser).child("name").observe(.value, with: { (dataSnapshot) in
             if let name = dataSnapshot.value as? String{
                 DispatchQueue.main.async {

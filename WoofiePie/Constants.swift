@@ -283,6 +283,25 @@ extension UIImage {
     }
 }
 
+
+func uploadImage(image: UIImage, imageName: String , directory : String , completion: @escaping (_ Result : Bool)->()){
+    let ref = storageRef.child(directory).child(imageName)
+      guard let pngdata = UIImagePNGRepresentation(image) else {return }
+    ref.put(pngdata, metadata: nil) { (data, error) in
+        if let error = error {
+            print("error uploading data \(error)")
+            completion(false)
+            return
+        }
+        if let _ = data {
+            completion(true)
+        }
+    }
+}
+
+
+
+
 func cacheImage(image : UIImage, imageName : String){
     
     DispatchQueue.global().async {

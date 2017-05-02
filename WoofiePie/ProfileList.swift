@@ -44,7 +44,7 @@ class ProfileList: UIViewController  , UITableViewDelegate, UITableViewDataSourc
         profileListTableView.dataSource = self
         
         super.viewDidLoad()
-        
+         self.profileListTableView.contentInset = UIEdgeInsets(top: 5.0, left: 0, bottom: 0, right: 0)
         if type == .FollowersList{
             topLabel.text = "Followers"
            
@@ -119,9 +119,7 @@ class ProfileList: UIViewController  , UITableViewDelegate, UITableViewDataSourc
         return cell
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 100.0
-    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
        
         let person = self.userList[indexPath.row]

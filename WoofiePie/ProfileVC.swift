@@ -71,13 +71,61 @@ class ProfileVC: UIViewController , UITableViewDelegate , UITableViewDataSource 
             locationName.text = "Location Not Provided"
         }
         //TODO: set the saved progile image
-        petList.contentInset = UIEdgeInsets(top: 8.0, left: 0, bottom: 0, right: 0)
+        petList.contentInset = UIEdgeInsets(top: 4.0, left: 0, bottom: 0, right: 0)
         getUserDetails(userId: self.userId)
        
         
         
         
     }
+    @IBAction func settingsButtonPressed(_ sender: Any) {
+        
+        let actionController = UIAlertController(title: "Settings", message: nil, preferredStyle: .alert)
+        let signOutAction = UIAlertAction(title: "Signout", style: .destructive) { (action) in
+            //handle signout here
+            self.dismiss(animated: true, completion: nil)
+            do {
+                try FIRAuth.auth()?.signOut()
+                UserDefaults.standard.setValue(nil, forKey: "uid")
+                UserDefaults.standard.setValue(nil, forKey: "username")
+                UserDefaults.standard.synchronize()
+               self.dismiss(animated: true, completion: nil)
+            }
+            catch {
+                print(" error occured while signing out \(error)")
+                displayMessage(title: "Error!", message: "Please contact woofiepie support.", presenter: self)
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
+            actionController.dismiss(animated: true, completion: nil)
+        }
+        
+        let passwordReset = UIAlertAction(title: "Reset Password", style: .default) { (action) in
+            //reset password
+            if let email = FIRAuth.auth()?.currentUser?.email {
+                FIRAuth.auth()?.sendPasswordReset(withEmail: email, completion: { (error) in
+                    if let error = error {
+                displayMessage(title: "Error!", message: "Unable to send password reset email", presenter: self)
+                    }
+                    else {
+                        displayMessage(title: nil, message: "Please check inbox.", presenter: self)
+                    }
+                })
+            }
+            else {
+                displayMessage(title: nil, message: "Please signout and reset password at login page.", presenter: self)
+            }
+        }
+        
+        actionController.addAction(passwordReset)
+        actionController.addAction(signOutAction)
+        actionController.addAction(cancelAction)
+        
+        self.present(actionController, animated: true, completion: nil)
+        
+    }
+    
     
     func followingLabelTapped(sender: Any){
         
@@ -96,7 +144,7 @@ class ProfileVC: UIViewController , UITableViewDelegate , UITableViewDataSource 
         //TODO: update images
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
-        let actionView = UIAlertController(title: "Update Image", message: nil, preferredStyle: .actionSheet)
+        let actionView = UIAlertController(title: "Update Image", message: nil, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
        
         let selectPhoto = UIAlertAction(title: "Image Gallery", style: .default) { (action) in
@@ -280,7 +328,7 @@ class ProfileVC: UIViewController , UITableViewDelegate , UITableViewDataSource 
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete{
         let pet = self.pets[indexPath.row]
-            confirmDeletePet(pet: pet)
+            confirmDeletePet(pet: pet, index: indexPath.row)
         }
         
     }
@@ -328,11 +376,13 @@ class ProfileVC: UIViewController , UITableViewDelegate , UITableViewDataSource 
     }
     
     
-    func confirmDeletePet(pet : Pet){
-        let actionController = UIAlertController(title: "Confirm Delete?", message: nil, preferredStyle: .actionSheet)
+    func confirmDeletePet(pet : Pet , index : Int){
+        let actionController = UIAlertController(title: "Confirm Delete?", message: nil, preferredStyle: .alert)
+       // actionController.popoverPresentationController
         let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { (action) in
             //
             ref.child("Users").child(self.userId).child("pets").child(pet.petId).setValue(nil)
+            self.pets.remove(at: index)
             self.petList.reloadData()
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in

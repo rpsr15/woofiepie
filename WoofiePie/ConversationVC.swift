@@ -9,24 +9,24 @@
 import UIKit
 import Firebase
 import JSQMessagesViewController
-class ConversationVC: UIViewController {
-    
+import AVFoundation
+
+class ConversationVC: UIViewController  {
+    let systemSoundID: SystemSoundID = 1016
      var conversations = [Conversation]()
      var conversationList = [String]()
      var currentUserId : String!
+ 
     @IBOutlet weak var tableView : UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.currentUserId = UserDefaults.standard.value(forKey: "uid") as! String
-        //load full comversations by getting ids and then details
-        print(#function)
+        
         self.loadConversations()
       
     }
-    
-    
-    
+  
     func loadConversations(){
         print(#function)
         ref.child("Users").child(self.currentUserId).child("conversations").observe(.value, with: { (snap) in
@@ -54,6 +54,14 @@ class ConversationVC: UIViewController {
         }
     }
     
+    @IBAction func newMessagePressed(_ sender: Any) {
+       //display follower list
+        
+        if   let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "profilelist") as? ProfileList{
+            vc.type = ProfileListType.FollowingList
+            self.present(vc, animated: true, completion: nil)
+        }
+    }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "chatVC"{
@@ -63,6 +71,7 @@ class ConversationVC: UIViewController {
     }
 
 }
+    
 }
 
 extension ConversationVC : UITableViewDelegate , UITableViewDataSource{
@@ -72,41 +81,61 @@ extension ConversationVC : UITableViewDelegate , UITableViewDataSource{
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.conversations.count
+    
+             return self.conversations.count
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "conversationCell", for: indexPath) as! ConversationCell
-        let conversation = self.conversations[indexPath.row]
-       print("hasRead \(conversation.hasRead)")
-        if conversation.hasRead == false {
-            cell.hasReadButton.isHidden = false
-        }
-        else {
-            cell.hasReadButton.isHidden = true
-        }
+       
         
-        cell.configureCell(useridOfOtherUser: conversation.idOfOtherUser(senderuserid: self.currentUserId), latestMessage: conversation.messages.last?.text ?? "")
-        return cell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "conversationCell", for: indexPath) as! ConversationCell
+            let conversation = self.conversations[indexPath.row]
+            print("hasRead \(conversation.hasRead)")
+            if conversation.hasRead == false {
+                cell.hasReadButton.isHidden = false
+                
+            }
+            else {
+                cell.hasReadButton.isHidden = true
+            }
+            
+            cell.configureCell(useridOfOtherUser: conversation.idOfOtherUser(senderuserid: self.currentUserId), latestMessage: conversation.messages.last?.text ?? "")
+            return cell
+            
+      
         
+    }
+    func presentChatVC(conversation : Conversation){
         
-        
+        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "chatVC") as! chatHolderVC
+        vc.conversation = conversation
+        self.present(vc, animated: true, completion: nil)
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(#function)
-        let conv = self.conversations[indexPath.row]
-        performSegue(withIdentifier: "chatVC", sender: conv)
-    }
+       
+        
+      
+            let conv = self.conversations[indexPath.row]
+            performSegue(withIdentifier: "chatVC", sender: conv)
+           }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete{
-            let conversation = self.conversations[indexPath.row]
-            confirmDelete(conversation: conversation)
+       
+       
+            if editingStyle == .delete{
+                let conversation = self.conversations[indexPath.row]
+                confirmDelete(conversation: conversation)
+          
+            
         }
+       
     }
     
     func confirmDelete(conversation : Conversation){
-        let vc = UIAlertController(title: "Confirm Delete?", message: nil, preferredStyle: .actionSheet)
+        let vc = UIAlertController(title: "Confirm Delete?", message: nil, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { (action) in
             ref.child("Users").child(self.currentUserId).child("conversations").child(conversation.conversationId).child("messages").setValue(nil)
@@ -115,5 +144,8 @@ extension ConversationVC : UITableViewDelegate , UITableViewDataSource{
         vc.addAction(deleteAction)
         self.present(vc, animated: true, completion: nil)
     }
+    
+    
+ 
     
 }

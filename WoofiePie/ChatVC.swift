@@ -9,7 +9,7 @@
 import UIKit
 import JSQMessagesViewController
 import Firebase
-class ChatVC: JSQMessagesViewController {
+class ChatVC: JSQMessagesViewController , UIImagePickerControllerDelegate , UINavigationControllerDelegate {
     var delegate: chatHolderVC!
     var conversationId : String!
     let incomingSource = MessageAvatarAndBubbleImageDataSource(sourceType: .Incoming)
@@ -26,7 +26,7 @@ class ChatVC: JSQMessagesViewController {
         // Do any additional setup after loading the view.
       //
         self.loadMessages()
-//        ref.child("Users").child(self.senderId).child("conversations").child(self.conversationId).child("hasRead").setValue(true)
+        ref.child("Users").child(self.senderId).child("conversations").child(self.conversationId).child("hasRead").setValue(true)
         
     }
     
@@ -89,6 +89,32 @@ ref.child("Users").child(self.delegate.conversation.party1).child("conversations
     
     override func didPressAccessoryButton(_ sender: UIButton!) {
         print("camera button presssed")
+        displayMessage(title: "Not Supported", message: "Please check in updated version", presenter: self)
+//        let imagePicker = UIImagePickerController()
+//        imagePicker.delegate = self
+//        
+//        let actionSheet = UIAlertController(title: "Select Media Source", message: nil, preferredStyle: .actionSheet)
+//       if  UIImagePickerController.isSourceTypeAvailable(.camera){
+//            let cameraAction = UIAlertAction(title: "Camera", style: .default, handler: { (action) in
+//                //presrnt
+//                imagePicker.sourceType = .camera
+//                self.present(imagePicker, animated: true, completion: nil)
+//            })
+//        
+//        actionSheet.addAction(cameraAction)
+//        }
+//        
+//        let imageAction = UIAlertAction(title: "Gallery", style: .default) { (action) in
+//            //preset gallrey
+//            imagePicker.sourceType = .photoLibrary
+//            self.present(imagePicker, animated: true, completion: nil)
+//        }
+//        
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+//        
+//        actionSheet.addAction(imageAction)
+//        actionSheet.addAction(cancelAction)
+//        self.present(actionSheet, animated: true, completion: nil)
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
@@ -134,6 +160,43 @@ ref.child("Users").child(self.delegate.conversation.party1).child("conversations
         
 
     }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let key = UIImagePickerControllerOriginalImage
+        if let image = info[key] as? UIImage{
+            let uniqueName = self.senderId+String(Int(NSDate().timeIntervalSince1970))
+            let message = Message(senderid: self.senderId, textBody: "", mediaPath: uniqueName, createdOn: NSDate().timeIntervalSince1970, isMedia: true)
+            uploadImage(image: image, imageName: uniqueName, directory: "conversations", completion: { (result) in
+                if result{
+                    //append message and upload it
+                    self.messages.append(message)
+                    //upload data to firebase
+                    ref.child("Users").child(self.delegate.conversation.party2).child("conversations").child(self.conversationId).child("lastUpdated").setValue(NSDate().timeIntervalSince1970)
+                    ref.child("Users").child(self.delegate.conversation.party2).child("conversations").child(self.conversationId).child("messages").childByAutoId().setValue(message.getDictionary())
+                    ref.child("Users").child(self.delegate.conversation.party1).child("conversations").child(self.conversationId).child("messages").childByAutoId().setValue(message.getDictionary()) { (error, ref) in
+                        if let error = error {
+                            print("error setting  value \(error)")
+                        }
+                        print(ref)
+                    }
+                    ref.child("Users").child(self.delegate.conversation.party1).child("conversations").child(self.conversationId).child("lastUpdated").setValue(NSDate().timeIntervalSince1970)
+                    if self.senderId == self.delegate.conversation.party1{
+                        ref.child("Users").child(self.delegate.conversation.party2).child("conversations").child(self.conversationId).child("hasRead").setValue(false)
+                    }
+                    else {
+                        ref.child("Users").child(self.delegate.conversation.party1).child("conversations").child(self.conversationId).child("hasRead").setValue(false)
+                    }
+                    
+                    
+                    self.finishSendingMessage(animated: true)
+                    
+                }
+            })
+        }
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    
     
     
 

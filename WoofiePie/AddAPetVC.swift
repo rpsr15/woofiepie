@@ -89,7 +89,7 @@ class AddAPetVC: UIViewController , UIImagePickerControllerDelegate , UINavigati
     @IBAction func imageSelectPressed(_ sender: Any) {
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
-        let imageSourceSelector = UIAlertController(title: "Set Profile Picture", message: nil, preferredStyle: .actionSheet)
+        let imageSourceSelector = UIAlertController(title: "Set Profile Picture", message: nil, preferredStyle: .alert)
         //check if camera is available
         let albumAction = UIAlertAction(title: "Choose from Album", style: .default, handler: {
             action in
