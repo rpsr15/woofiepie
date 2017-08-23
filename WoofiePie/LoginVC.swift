@@ -2,7 +2,7 @@
 //  LoginVC.swift
 //  WoofiePie
 //
-//  Created by Ravi on 08/03/17.
+//  Created by Ravi Rathore on 08/07/17.
 //  Copyright © 2017 Ravi. All rights reserved.
 //
 
